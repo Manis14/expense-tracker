@@ -94,6 +94,10 @@ The app uses ARIMA (AutoRegressive Integrated Moving Average) to:
 Implemented in ''' Forecast.py'''.
 
 
+Demo 
 
 
+
+
+https://github.com/user-attachments/assets/00a75c9e-68c7-43f7-81be-3bec5fafff89
 
