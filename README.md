@@ -79,6 +79,20 @@ MAIL_FROM=youremail@example.com
 SECRET_KEY=your_secret_key
 ```
 
+### 4. Run the app 
+```bash
+uvicorn main:app --reload
+```
+
+📈 Forecasting Model (ARIMA)
+The app uses ARIMA (AutoRegressive Integrated Moving Average) to:
+
+  - Train on user's historical expenses
+  - Forecast future spending trends
+  - Visualize predictions using Plotly charts
+
+Implemented in ''' Forecast.py'''.
+
 
 
 
