@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expense Analysis - Expense Tracker</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            /* Modern Color Palette */
+            --primary-color: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary-color: #10b981;
+            --accent-color: #f59e0b;
+            --danger-color: #ef4444;
+            --warning-color: #f97316;
+
+            /* Neutral Colors */
+            --background: #f8fafc;
+            --surface: #ffffff;
+            --surface-alt: #f1f5f9;
+            --border: #e2e8f0;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --text-muted: #94a3b8;
+
+            /* Gradients */
+            --gradient-primary: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            --gradient-success: linear-gradient(135deg, var(--secondary-color), #059669);
+            --gradient-accent: linear-gradient(135deg, var(--accent-color), #d97706);
+
+            /* Shadows */
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+
+            --border-radius: 12px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--background);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header Styles */
+        .header {
+            background: var(--gradient-primary);
+            color: white;
+            padding: 1.5rem 0;
+            margin-bottom: 2rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-lg);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .logo {
+            font-size: 1.75rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logo i {
+            font-size: 2rem;
+            color: var(--accent-color);
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            padding: 0.75rem 1.25rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 500;
+        }
+
+        .nav-links a:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-1px);
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-links a.active {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            box-shadow: var(--shadow-sm);
+        }
+
+        /* Card Styles */
+        .card {
+            background: var(--surface);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-md);
+            padding: 2rem;
+            margin: 1.5rem 0;
+            border: 1px solid var(--border);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient-primary);
+        }
+
+        .section-title {
+            color: var(--text-primary);
+            margin-bottom: 2rem;
+            font-size: 1.75rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            position: relative;
+            padding-bottom: 1rem;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 60px;
+            height: 3px;
+            background: var(--gradient-accent);
+            border-radius: 2px;
+        }
+
+        .section-title i {
+            color: var(--primary-color);
+            font-size: 1.5rem;
+        }
+                /* Forecast Section - Make sure it's visible */
+        .forecast-section {
+            background: var(--surface-alt) !important;
+            padding: 2rem !important;
+            border-radius: var(--border-radius) !important;
+            margin: 2rem 0 !important;
+            border: 1px solid var(--border) !important;
+            display: block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+            position: relative !important;
+            z-index: 1 !important;
+        }
+
+        .forecast-form {
+            display: grid !important;
+            grid-template-columns: 1fr 1fr auto !important;
+            gap: 1.5rem !important;
+            align-items: end !important;
+            margin-bottom: 2rem !important;
+        }
+
+        .forecast-form .form-group {
+            display: flex !important;
+            flex-direction: column !important;
+        }
+
+        .forecast-form .form-input {
+            background: var(--surface) !important;
+            color: var(--text-primary) !important;
+            border: 2px solid var(--border) !important;
+            border-radius: 8px !important;
+            padding: 0.875rem 1rem !important;
+        }
+
+        .forecast-form .form-label {
+            color: var(--text-primary) !important;
+            margin-bottom: 0.5rem !important;
+            font-weight: 600 !important;
+        }
+
+        .forecast-form .btn-primary {
+            background: var(--gradient-primary) !important;
+            color: black !important;
+            border: none !important;
+            padding: 0.875rem 1.5rem !important;
+            border-radius: 8px !important;
+        }
+
+        .forecast-result {
+            background: white !important; /* Changed to white background */
+            color: #1e293b !important; /* Changed to black/dark text */
+            padding: 2.5rem;
+            border-radius: var(--border-radius);
+            text-align: center;
+            margin-top: 1rem;
+            border: 2px solid var(--border);
+            box-shadow: var(--shadow-md);
+        }
+
+        .forecast-result h3 {
+            color: var(--primary-color) !important; /* Keep header blue */
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .forecast-result p {
+            margin: 0.5rem 0;
+            position: relative;
+            z-index: 1;
+            color: var(--text-primary) !important; /* Dark text */
+        }
+
+        .forecast-result .stat-value {
+            color: var(--secondary-color) !important; /* Green for the amount */
+            font-weight: 800 !important;
+        }
+
+        /* Update Category Table Amount Cells */
+        .amount-cell {
+            font-weight: 700;
+            color: var(--secondary-color);
+            font-size: 1.1rem;
+        }
+
+        /* Update Statistics Cards */
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 800;
+            display: block;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+
+        /* Category Table Styles */
+        .category-table-section {
+            background: var(--surface);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-md);
+            margin: 1.5rem 0 2rem 0;
+            border: 1px solid var(--border);
+            overflow: hidden;
+        }
+
+        .category-table-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient-success);
+        }
+
+        .table-header {
+            background: var(--gradient-success);
+            color: white;
+            padding: 1.5rem 2rem;
+            position: relative;
+        }
+
+        .table-header h2 {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        .category-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--surface);
+        }
+
+        .category-table th {
+            background: var(--primary-color);
+            color: white;
+            padding: 1rem 1.5rem;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 3px solid var(--primary-dark);
+        }
+
+        .category-table td {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--border);
+            vertical-align: middle;
+        }
+
+        .category-table tbody tr {
+            transition: all 0.3s ease;
+        }
+
+        .category-table tbody tr:hover {
+            background: var(--surface-alt);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .category-name {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .category-name i {
+            color: var(--primary-color);
+        }
+
+        .amount-cell {
+            font-weight: 700;
+            color: var(--secondary-color);
+            font-size: 1.1rem;
+        }
+
+        .percentage-cell {
+            font-weight: 600;
+            color: var(--accent-color);
+        }
+
+        .percentage-bar {
+            background: var(--surface-alt);
+            height: 6px;
+            border-radius: 3px;
+            overflow: hidden;
+            margin-top: 4px;
+        }
+
+        .percentage-fill {
+            height: 100%;
+            background: var(--gradient-accent);
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+
+        /* No data state for table */
+        .no-category-data {
+            text-align: center;
+            padding: 3rem 2rem;
+            color: var(--text-secondary);
+            background: var(--surface-alt);
+        }
+
+        .no-category-data i {
+            font-size: 3rem;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+        }
+
+        .no-category-data h3 {
+            color: var(--text-primary);
+            margin: 1rem 0;
+            font-size: 1.25rem;
+        }
+
+        .btn {
+            padding: 0.875rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 1rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: var(--gradient-primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        /* Year Selector */
+        .year-selector {
+            background: var(--gradient-success);
+            padding: 2rem;
+            border-radius: var(--border-radius);
+            margin-bottom: 2rem;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            max-width: 300px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .form-label {
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: white;
+            font-size: 0.9rem;
+        }
+
+        .form-input {
+            padding: 0.875rem 1rem;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            font-size: 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: rgba(255, 255, 255, 0.6);
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
+        }
+
+        .form-input option {
+            background: var(--surface);
+            color: var(--text-primary);
+        }
+
+        /* Statistics and other sections remain the same... */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .stat-card {
+            background: var(--surface);
+            border: 2px solid var(--border);
+            padding: 2rem;
+            border-radius: var(--border-radius);
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient-primary);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-xl);
+            border-color: var(--primary-color);
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 800;
+            display: block;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .chart-container {
+            margin: 2rem 0;
+            background: var(--surface);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border);
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--text-secondary);
+            background: var(--surface-alt);
+            border-radius: var(--border-radius);
+            border: 2px dashed var(--border);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .nav {
+                flex-direction: column;
+                gap: 1rem;
+                padding: 1rem;
+            }
+
+            .nav-links {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 0.25rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .card {
+                padding: 1.5rem;
+            }
+
+            .section-title {
+                font-size: 1.5rem;
+            }
+
+            .category-table th,
+            .category-table td {
+                padding: 0.75rem 1rem;
+                font-size: 0.9rem;
+            }
+
+            .table-header {
+                padding: 1rem 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <nav class="nav">
+                <div class="logo">
+                    <i class="fas fa-chart-line"></i>
+                    Expense Tracker
+                </div>
+                <ul class="nav-links">
+                    <li><a href="/"><i class="fas fa-home"></i> Dashboard</a></li>
+                    <li><a href="/add-expense"><i class="fas fa-plus-circle"></i> Add Expense</a></li>
+                    <li><a href="/view-expense"><i class="fas fa-list-alt"></i> View Expenses</a></li>
+                    <li><a href="/analyze-expense" class="active"><i class="fas fa-chart-bar"></i> Analysis</a></li>
+                    <li><a href="/logout"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                </ul>
+            </nav>
+        </header>
+
+         <!-- Year Selection -->
+            <div class="year-selector">
+                <h3><i class="fas fa-calendar-alt"></i> Select Year for Analysis</h3>
+                <form method="get" action="/analyze-expense">
+                    <div class="form-group">
+                        <label for="selected_year" class="form-label">Choose Year:</label>
+                        <select name="selected_year" id="selected_year" class="form-input">
+                            {% for year in available_years %}
+                            <option value="{{ year }}" {% if year == selected_year %}selected{% endif %}>
+                                {{ year }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <input type="hidden" name="forecast_mode" value="{{ forecast_mode }}">
+                    <input type="hidden" name="forecast_value" value="{{ forecast_value }}">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-search"></i>
+                        Analyze Year
+                    </button>
+                </form>
+            </div>
+
+            <!-- Yearly Statistics -->
+            {% if yearly_stats %}
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <span class="stat-value">{{ "%.2f"|format(yearly_stats.total) }}</span>
+                    <div class="stat-label">Total Expenses {{ selected_year }}</div>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-value">{{ "%.2f"|format(yearly_stats.average) }}</span>
+                    <div class="stat-label">Monthly Average</div>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-value">{{ yearly_stats.highest_month }}</span>
+                    <div class="stat-label">Highest: {{ "%.2f"|format(yearly_stats.highest_amount) }}</div>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-value">{{ yearly_stats.lowest_month }}</span>
+                    <div class="stat-label">Lowest: {{ "%.2f"|format(yearly_stats.lowest_amount) }}</div>
+                </div>
+            </div>
+            {% endif %}
+
+        <!-- Category Analysis Table - Added at the top -->
+
+        <div class="category-table-section">
+            <div class="table-header">
+                <h2><i class="fas fa-tags"></i> Category-wise Expense Analysis</h2>
+            </div>
+
+            {% if category_expenses %}
+            <div class="table-container">
+                <table class="category-table">
+                    <thead>
+                        <tr>
+                            <th>S.No</th>
+                            <th>Category</th>
+                            <th>Total Amount</th>
+                            <th>Total Transactions</th>
+                            <th>Average Amount</th>
+                            <th>Percentage</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% set total_amount = category_expenses | sum(attribute='amount') %}
+                        {% for expense in category_expenses %}
+                        <tr>
+                            <td><strong>{{ loop.index }}</strong></td>
+                            <td>
+                                <div class="category-name">
+                                    <i class="fas fa-tag"></i>
+                                    {{ expense.category }}
+                                </div>
+                            </td>
+                            <td class="amount-cell">{{ "%.2f"|format(expense.amount) }}</td>
+                            <td>{{ expense.Transaction }}</td>
+                            <td>{{ "%.2f"|format(expense.Avg) }}</td>
+                            <td>
+                                {% set percentage = (expense.amount / total_amount * 100) if total_amount > 0 else 0 %}
+                                <div class="percentage-cell">{{ "%.1f"|format(percentage) }}%</div>
+                                <div class="percentage-bar">
+                                    <div class="percentage-fill" style="width: {{ percentage }}%"></div>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="no-category-data">
+                <i class="fas fa-chart-pie"></i>
+                <h3>No Category Data Available</h3>
+                <p>You haven't added any expenses yet to analyze by category.</p>
+                <a href="/add-expense" class="btn btn-primary">
+                    <i class="fas fa-plus"></i>
+                    Add Your First Expense
+                </a>
+            </div>
+            {% endif %}
+        </div>
+
+
+        <div class="card">
+            <h1 class="section-title">
+                <i class="fas fa-analytics"></i>
+                Interactive Expense Analysis
+            </h1>
+
+
+
+        <!--Chart-->
+            <h2>Pie Chart: Category-wise Amount</h2>
+                {% if plot_pie %}
+                    {{ plot_pie | safe }}
+                {% endif %}
+
+            <h2>Bar Chart: Monthly Spending by Category</h2>
+                {% if plot_bar %}
+                    {{ plot_bar | safe }}
+                {% endif %}
+
+                        <!-- Forecast Section -->
+            <div class="forecast-section">
+                <h2 class="section-title">
+                    <i class="fas fa-crystal-ball"></i>
+                    Expense Forecast
+                </h2>
+
+                <form method="get" action="/analyze-expense" class="forecast-form">
+                    <div class="form-group">
+                        <label for="forecast_mode" class="form-label">Forecast Mode:</label>
+                        <select name="forecast_mode" id="forecast_mode" class="form-input">
+                            <option value="months" {% if forecast_mode == 'months' %}selected{% endif %}>Months</option>
+                            <option value="year" {% if forecast_mode == 'year' %}selected{% endif %}>Year</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="forecast_value" class="form-label">
+                            <span id="forecast_label">
+                                {% if forecast_mode == 'months' %}Number of Months:{% else %}Year:{% endif %}
+                            </span>
+                        </label>
+                        <input type="number" name="forecast_value" id="forecast_value"
+                               class="form-input" value="{{ forecast_value }}"
+                               min="1" {% if forecast_mode == 'year' %}min="2024"{% endif %} required>
+                    </div>
+
+                    <input type="hidden" name="selected_year" value="{{ selected_year }}">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-magic"></i>
+                        Generate Forecast
+                    </button>
+                </form>
+                <div class="forecast-result">
+                    <h3><i class="fas fa-chart-trend-up"></i> Forecast Results</h3>
+                    <p><strong>Mode:</strong> {{ forecast_mode.capitalize() }}</p>
+                    <p><strong>Period:</strong> {{ forecast_value }} {{ 'month(s)' if forecast_mode == 'months' else 'year' }}</p>
+                    <div class="stat-value" style="font-size: 2.5rem; margin: 1.5rem 0; color: var(--secondary-color) !important;">
+                        {{ forecast }}
+                    </div>
+                    {% if is_numeric_forecast %}
+                        <p><strong>Estimated Total Expense</strong></p>
+                    {% endif %}
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Render monthly chart
+        {% if monthly_chart_json %}
+        var monthlyGraphJSON = {{ monthly_chart_json|safe }};
+        Plotly.newPlot('monthlyChart', monthlyGraphJSON.data, monthlyGraphJSON.layout, {responsive: true});
+        {% endif %}
+
+        // Render category chart
+        {% if category_chart_json %}
+        var categoryGraphJSON = {{ category_chart_json|safe }};
+        Plotly.newPlot('categoryChart', categoryGraphJSON.data, categoryGraphJSON.layout, {responsive: true});
+        {% endif %}
+
+        // Update forecast form labels
+        document.getElementById('forecast_mode').addEventListener('change', function() {
+            const mode = this.value;
+            const label = document.getElementById('forecast_label');
+            const input = document.getElementById('forecast_value');
+
+            if (mode === 'months') {
+                label.textContent = 'Number of Months:';
+                input.min = '1';
+                input.value = '1';
+            } else {
+                label.textContent = 'Year:';
+                input.min = '2024';
+                input.value = '2024';
+            }
+        });
+    </script>
+</body>
+</html>

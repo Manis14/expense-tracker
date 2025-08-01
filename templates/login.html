@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Expense Tracker</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <div class="auth-container">
+            <div class="card">
+                <div class="card-header">
+                    <h1 class="card-title">
+                        <i class="fas fa-wallet"></i>
+                        Welcome to Expense Tracker
+                    </h1>
+                    <p>Please sign in to your account</p>
+                </div>
+
+                {% if message %}
+                <div class="alert alert-{{ 'success' if message_type == 'success' else 'error' }}">
+                    <i class="fas fa-{{ 'check-circle' if message_type == 'success' else 'exclamation-triangle' }}"></i>
+                    {{ message }}
+                </div>
+                {% endif %}
+
+                <form method="post" action="/login" class="auth-form">
+                    <div class="form-group">
+                        <label for="email" class="form-label">
+                            <i class="fas fa-envelope"></i>
+                            Email Address
+                        </label>
+                        <input type="email" id="email" name="email" class="form-input" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password" class="form-label">
+                            <i class="fas fa-lock"></i>
+                            Password
+                        </label>
+                        <input type="password" id="password" name="password" class="form-input" required>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-full">
+                        <i class="fas fa-sign-in-alt"></i>
+                        Sign In
+                    </button>
+                </form>
+
+                <div class="auth-links">
+                    <a href="/forgot-password" class="link">
+                        <i class="fas fa-question-circle"></i>
+                        Forgot Password?
+                    </a>
+                    <a href="/register" class="link">
+                        <i class="fas fa-user-plus"></i>
+                        Create New Account
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .auth-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 0;
+        }
+
+        .card {
+            max-width: 400px;
+            width: 100%;
+        }
+
+        .btn-full {
+            width: 100%;
+            margin: 1rem 0;
+        }
+
+        .auth-links {
+            text-align: center;
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .auth-links .link {
+            display: block;
+            margin: 0.5rem 0;
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .auth-links .link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</body>
+</html>

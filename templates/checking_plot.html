@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Expense Plots</title>
+</head>
+<body>
+    <h2>Pie Chart: Category-wise Amount</h2>
+    {% if plot_pie %}
+        {{ plot_pie | safe }}
+    {% endif %}
+
+    <h2>Bar Chart: Monthly Spending by Category</h2>
+    {% if plot_bar %}
+        {{ plot_bar | safe }}
+    {% endif %}
+</body>
+</html>

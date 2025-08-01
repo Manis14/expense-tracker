@@ -1,0 +1,1158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Expenses - Expense Tracker</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* Keep all your existing CSS styles - they look perfect */
+        :root {
+            /* Modern Color Palette */
+            --primary-color: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary-color: #10b981;
+            --accent-color: #f59e0b;
+            --danger-color: #ef4444;
+            --warning-color: #f97316;
+
+            /* Neutral Colors */
+            --background: #f8fafc;
+            --surface: #ffffff;
+            --surface-alt: #f1f5f9;
+            --border: #e2e8f0;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --text-muted: #94a3b8;
+
+            /* Gradients */
+            --gradient-primary: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            --gradient-success: linear-gradient(135deg, var(--secondary-color), #059669);
+            --gradient-accent: linear-gradient(135deg, var(--accent-color), #d97706);
+            --gradient-danger: linear-gradient(135deg, var(--danger-color), #dc2626);
+
+            /* Shadows */
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+
+            --border-radius: 12px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--background);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header Styles */
+        .header {
+            background: var(--gradient-primary);
+            color: white;
+            padding: 1.5rem 0;
+            margin-bottom: 2rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-lg);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: shimmer 6s ease-in-out infinite;
+        }
+
+        @keyframes shimmer {
+            0%, 100% { transform: translate(-50%, -50%) rotate(0deg); }
+            50% { transform: translate(-50%, -50%) rotate(180deg); }
+        }
+
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .logo {
+            font-size: 1.75rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logo i {
+            font-size: 2rem;
+            color: var(--accent-color);
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            padding: 0.75rem 1.25rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 500;
+        }
+
+        .nav-links a:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-1px);
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-links a.active {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            box-shadow: var(--shadow-sm);
+        }
+
+        /* Page Header */
+        .page-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .page-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        .page-title i {
+            color: var(--primary-color);
+        }
+
+        .page-subtitle {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
+        /* Filter Section */
+        .filter-section {
+            background: var(--surface);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-md);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border: 1px solid var(--border);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .filter-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient-accent);
+        }
+
+        .filter-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .filter-title i {
+            color: var(--accent-color);
+        }
+
+        .filter-form {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            align-items: end;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-label {
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .form-label i {
+            color: var(--primary-color);
+            width: 16px;
+        }
+
+        .form-input, .form-select {
+            padding: 0.875rem 1rem;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: var(--surface);
+            font-family: inherit;
+        }
+
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+            transform: translateY(-1px);
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 1rem;
+            grid-column: 1 / -1;
+            justify-content: center;
+            margin-top: 1rem;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.875rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary {
+            background: var(--gradient-primary);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: var(--surface-alt);
+            color: var(--text-primary);
+            border: 2px solid var(--border);
+        }
+
+        .btn-success {
+            background: var(--gradient-success);
+            color: white;
+        }
+
+        .btn-danger {
+            background: var(--gradient-danger);
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        /* Stats Cards */
+        .stats-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--surface);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-md);
+            padding: 2rem;
+            border: 1px solid var(--border);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+        }
+
+        .stat-card:nth-child(1)::before {
+            background: var(--gradient-success);
+        }
+
+        .stat-card:nth-child(2)::before {
+            background: var(--gradient-primary);
+        }
+
+        .stat-card:nth-child(3)::before {
+            background: var(--gradient-accent);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--primary-color);
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+
+        /* Expenses Table */
+        .expenses-section {
+            background: var(--surface);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .expenses-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient-success);
+        }
+
+        .section-header {
+            background: var(--surface-alt);
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .section-title i {
+            color: var(--secondary-color);
+        }
+
+        .bulk-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        .expenses-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .expenses-table th {
+            background: var(--primary-color);
+            color: white;
+            padding: 1rem 1.5rem;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .expenses-table td {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--border);
+            vertical-align: middle;
+        }
+
+        .expenses-table tbody tr {
+            transition: all 0.3s ease;
+        }
+
+        .expenses-table tbody tr:hover {
+            background: var(--surface-alt);
+            transform: scale(1.01);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .expense-date {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .expense-category {
+            background: var(--surface-alt);
+            color: var(--primary-color);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .expense-amount {
+            font-weight: 700;
+            color: var(--secondary-color);
+            font-size: 1.1rem;
+        }
+
+        .expense-description {
+            color: var(--text-secondary);
+            max-width: 200px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-sm {
+            padding: 0.5rem 1rem;
+            font-size: 0.85rem;
+            border-radius: 6px;
+        }
+
+        .btn-edit {
+            background: var(--accent-color);
+            color: white;
+        }
+
+        .btn-delete {
+            background: var(--danger-color);
+            color: white;
+        }
+
+        /* Checkbox Styles */
+        .custom-checkbox {
+            width: 20px;
+            height: 20px;
+            accent-color: var(--primary-color);
+        }
+
+        /* No Data State */
+        .no-data {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--text-secondary);
+        }
+
+        .no-data i {
+            font-size: 4rem;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+        }
+
+        .no-data h3 {
+            color: var(--text-primary);
+            margin: 1rem 0;
+            font-size: 1.5rem;
+        }
+
+        .no-data p {
+            margin-bottom: 2rem;
+            font-size: 1.1rem;
+        }
+
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 2rem;
+            background: var(--surface-alt);
+        }
+
+        .page-btn {
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            color: var(--text-primary);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .page-btn:hover, .page-btn.active {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        /* Loading State */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Checkbox Group Styles */
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px;
+            margin-top: 8px;
+            max-height: 200px;
+            overflow-y: auto;
+            padding: 10px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            background: var(--surface-alt);
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            background: var(--surface);
+            border: 2px solid var(--border);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .checkbox-item:hover {
+            border-color: var(--primary-color);
+            background: #f0f2ff;
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            display: none;
+        }
+
+        .checkbox-custom {
+            width: 18px;
+            height: 18px;
+            border: 2px solid var(--border);
+            border-radius: 4px;
+            margin-right: 10px;
+            position: relative;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+        }
+
+        .checkbox-item input[type="checkbox"]:checked + .checkbox-custom {
+            background: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        .checkbox-item input[type="checkbox"]:checked + .checkbox-custom::after {
+            content: '✓';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .checkbox-item input[type="checkbox"]:checked ~ .checkbox-label {
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        .checkbox-label {
+            flex: 1;
+            color: var(--text-primary);
+            transition: color 0.3s ease;
+            user-select: none;
+        }
+
+        /* Category filter controls */
+        .category-controls {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 8px;
+            justify-content: flex-end;
+        }
+
+        .category-control-btn {
+            padding: 4px 8px;
+            font-size: 0.8rem;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            color: var(--text-secondary);
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .category-control-btn:hover {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .filter-form {
+                grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            }
+
+            .section-header {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .nav {
+                flex-direction: column;
+                gap: 1rem;
+                padding: 1rem;
+            }
+
+            .nav-links {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 0.25rem;
+            }
+
+            .filter-form {
+                grid-template-columns: 1fr;
+            }
+
+            .filter-buttons {
+                flex-direction: column;
+            }
+
+            .stats-section {
+                grid-template-columns: 1fr;
+            }
+
+            .page-title {
+                font-size: 2rem;
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .expenses-table {
+                font-size: 0.85rem;
+            }
+
+            .expenses-table th,
+            .expenses-table td {
+                padding: 0.75rem 1rem;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .checkbox-group {
+                grid-template-columns: 1fr;
+                gap: 8px;
+                max-height: 150px;
+            }
+
+            .checkbox-item {
+                padding: 6px 10px;
+                font-size: 0.85rem;
+            }
+
+            .checkbox-custom {
+                width: 16px;
+                height: 16px;
+                margin-right: 8px;
+            }
+        }
+
+        /* Animation for entrance */
+        .stat-card, .filter-section, .expenses-section {
+            animation: slideUp 0.6s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header Navigation -->
+        <header class="header">
+            <nav class="nav">
+                <div class="logo">
+                    <i class="fas fa-chart-line"></i>
+                    Expense Tracker
+                </div>
+                <ul class="nav-links">
+                    <li><a href="/"><i class="fas fa-home"></i> Dashboard</a></li>
+                    <li><a href="/add-expense"><i class="fas fa-plus-circle"></i> Add Expense</a></li>
+                    <li><a href="/view-expense" class="active"><i class="fas fa-list-alt"></i> View Expenses</a></li>
+                    <li><a href="/analyze-expense"><i class="fas fa-chart-bar"></i> Analysis</a></li>
+                    <li><a href="/logout"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1 class="page-title">
+                <i class="fas fa-list-alt"></i>
+                View & Manage Expenses
+            </h1>
+            <p class="page-subtitle">Filter, view, and manage all your recorded expenses</p>
+        </div>
+
+        <!-- Filter Section -->
+        <div class="filter-section">
+            <h2 class="filter-title">
+                <i class="fas fa-filter"></i>
+                Filter Your Expenses
+            </h2>
+
+            <form method="get" action="/view-expense" class="filter-form" id="filterForm">
+                <div class="form-group">
+                    <label for="start_date" class="form-label">
+                        <i class="fas fa-calendar-alt"></i>
+                        Start Date
+                    </label>
+                    <input type="date" id="start_date" name="start_date" class="form-input"
+                           value="{{ filters.start_date if filters else '' }}">
+                </div>
+
+                <div class="form-group">
+                    <label for="end_date" class="form-label">
+                        <i class="fas fa-calendar-check"></i>
+                        End Date
+                    </label>
+                    <input type="date" id="end_date" name="end_date" class="form-input"
+                           value="{{ filters.end_date if filters else '' }}">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-tags"></i>
+                        Categories <span id="categoryCount" style="color: var(--text-secondary); font-weight: normal;"></span>
+                    </label>
+                    <div class="category-controls">
+                        <button type="button" class="category-control-btn" onclick="selectAllCategories()">
+                            Select All
+                        </button>
+                        <button type="button" class="category-control-btn" onclick="clearAllCategories()">
+                            Clear All
+                        </button>
+                    </div>
+                    <div class="checkbox-group" id="categoryCheckboxGroup">
+                        {% for cat in categories %}
+                        <label class="checkbox-item">
+                            <input type="checkbox" name="category" value="{{ cat[0] }}" class="category-checkbox"
+                                   {% if filters and filters.selected_categories and cat[0] in filters.selected_categories %}checked{% endif %}>
+                            <span class="checkbox-custom"></span>
+                            <span class="checkbox-label">{{ cat[0] }}</span>
+                        </label>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="min_amount" class="form-label">
+                        <i class="fas fa-dollar-sign"></i>
+                        Min Amount
+                    </label>
+                    <input type="number" id="min_amount" name="min_amount" class="form-input"
+                           step="0.01" placeholder="0.00"
+                           value="{{ filters.min_amount if filters else '' }}">
+                </div>
+
+                <div class="form-group">
+                    <label for="max_amount" class="form-label">
+                        <i class="fas fa-dollar-sign"></i>
+                        Max Amount
+                    </label>
+                    <input type="number" id="max_amount" name="max_amount" class="form-input"
+                           step="0.01" placeholder="0.00"
+                           value="{{ filters.max_amount if filters else '' }}">
+                </div>
+
+                <div class="filter-buttons">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-search"></i>
+                        Apply Filters
+                    </button>
+                    <button type="button" class="btn btn-secondary" onclick="clearFilters()">
+                        <i class="fas fa-times"></i>
+                        Clear Filters
+                    </button>
+                    <a href="/download_expenses_csv" class="btn btn-success" id="downloadBtn">
+                        <i class="fas fa-download"></i>
+                        Export CSV
+                    </a>
+                </div>
+            </form>
+        </div>
+
+        <!-- Statistics Cards -->
+        {% if expenses %}
+        <div class="stats-section">
+            <div class="stat-card">
+                <span class="stat-value">{{ "%.2f"|format(expenses|sum(attribute='amount')) }}</span>
+                <div class="stat-label">Total Amount</div>
+            </div>
+            <div class="stat-card">
+                <span class="stat-value">{{ expenses|length }}</span>
+                <div class="stat-label">Total Records</div>
+            </div>
+            <div class="stat-card">
+                <span class="stat-value">{{ "%.2f"|format((expenses|sum(attribute='amount')) / (expenses|length)) if expenses|length > 0 else 0 }}</span>
+                <div class="stat-label">Average Amount</div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Expenses Table -->
+        <div class="expenses-section">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <i class="fas fa-table"></i>
+                    Your Expenses
+                </h2>
+                {% if expenses %}
+                <div class="bulk-actions">
+                    <button type="button" class="btn btn-secondary btn-sm" onclick="selectAll()">
+                        <i class="fas fa-check-square"></i>
+                        Select All
+                    </button>
+                    <button type="button" class="btn btn-danger btn-sm" onclick="deleteSelected()">
+                        <i class="fas fa-trash"></i>
+                        Delete Selected
+                    </button>
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="table-container">
+                {% if expenses %}
+                <table class="expenses-table">
+                    <thead>
+                        <tr>
+                            <th width="50">
+                                <input type="checkbox" class="custom-checkbox" id="selectAllCheckbox"
+                                       onchange="toggleAll(this)">
+                            </th>
+                            <th width="120">Date</th>
+                            <th width="150">Category</th>
+                            <th width="120">Amount</th>
+                            <th>Description</th>
+                            <th width="150">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for expense in expenses %}
+                        <tr>
+                            <td>
+                                <input type="checkbox" class="custom-checkbox expense-checkbox"
+                                       value="{{ expense.id }}">
+                            </td>
+                            <td class="expense-date">{{ expense.date }}</td>
+                            <td>
+                                <span class="expense-category">{{ expense.category }}</span>
+                            </td>
+                            <td class="expense-amount">{{ "%.2f"|format(expense.amount) }}</td>
+                            <td class="expense-description" title="{{ expense.description or 'No description' }}">
+                                {{ expense.description or '—' }}
+                            </td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="btn btn-edit btn-sm" onclick="editExpense({{ expense.id }})">
+                                        <i class="fas fa-edit"></i>
+                                        Edit
+                                    </button>
+                                    <form method="post" action="/delete_expense/{{ expense.id }}"
+                                          style="display: inline;" onsubmit="return confirmDelete()">
+                                        <button type="submit" class="btn btn-delete btn-sm">
+                                            <i class="fas fa-trash"></i>
+                                            Delete
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <div class="no-data">
+                    <i class="fas fa-receipt"></i>
+                    <h3>No Expenses Found</h3>
+                    {% if request.query_params %}
+                    <p>No expenses match your current filter criteria.</p>
+                    {% else %}
+                    <p>You haven't added any expenses yet.</p>
+                    {% endif %}
+                    <a href="/add-expense" class="btn btn-primary">
+                        <i class="fas fa-plus"></i>
+                        Add Your First Expense
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Hidden form for bulk delete -->
+<!--    <form id="bulkDeleteForm" method="post" action="/delete_multiple_expenses" style="display: none;">-->
+<!--        <input type="hidden" name="expense_ids" id="selectedIds">-->
+<!--    </form>-->
+        <form id="bulkDeleteForm" method="post" action="/delete_multiple_expenses" style="display: none;">
+            <!-- Individual expense_ids inputs will be added dynamically by JavaScript -->
+        </form>
+
+
+    <script>
+    // Clear filters function
+    function clearFilters() {
+        document.getElementById('filterForm').reset();
+        window.location.href = '/view-expense';
+    }
+
+    // Select all functionality
+    function toggleAll(checkbox) {
+        const expenseCheckboxes = document.querySelectorAll('.expense-checkbox');
+        expenseCheckboxes.forEach(cb => {
+            cb.checked = checkbox.checked;
+        });
+    }
+
+    function selectAll() {
+        const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+        selectAllCheckbox.checked = true;
+        toggleAll(selectAllCheckbox);
+    }
+
+    // Delete selected expenses - FIXED VERSION
+    function deleteSelected() {
+        const selectedCheckboxes = document.querySelectorAll('.expense-checkbox:checked');
+
+        if (selectedCheckboxes.length === 0) {
+            alert('Please select expenses to delete.');
+            return;
+        }
+
+        if (confirm(`Are you sure you want to delete ${selectedCheckboxes.length} selected expense(s)?`)) {
+            const selectedIds = Array.from(selectedCheckboxes).map(cb => cb.value);
+
+            // Clear any existing hidden inputs
+            const bulkDeleteForm = document.getElementById('bulkDeleteForm');
+            const existingInputs = bulkDeleteForm.querySelectorAll('input[name="expense_ids"]');
+            existingInputs.forEach(input => input.remove());
+
+            // Add each expense ID as a separate form field
+            selectedIds.forEach(id => {
+                const hiddenInput = document.createElement('input');
+                hiddenInput.type = 'hidden';
+                hiddenInput.name = 'expense_ids';
+                hiddenInput.value = id;
+                bulkDeleteForm.appendChild(hiddenInput);
+            });
+
+            bulkDeleteForm.submit();
+        }
+    }
+
+    // Single delete confirmation
+    function confirmDelete() {
+        return confirm('Are you sure you want to delete this expense?');
+    }
+
+    // Edit expense function
+    function editExpense(expenseId) {
+        window.location.href = `/edit_expense/${expenseId}`;
+    }
+
+    // Category selection functions
+    function selectAllCategories() {
+        const checkboxes = document.querySelectorAll('.category-checkbox');
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = true;
+        });
+        updateCategoryCount();
+    }
+
+    function clearAllCategories() {
+        const checkboxes = document.querySelectorAll('.category-checkbox');
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = false;
+        });
+        updateCategoryCount();
+    }
+
+    // Show selected count
+    function updateCategoryCount() {
+        const selectedCheckboxes = document.querySelectorAll('.category-checkbox:checked');
+        const countElement = document.getElementById('categoryCount');
+        if (countElement) {
+            countElement.textContent = selectedCheckboxes.length > 0 ? `(${selectedCheckboxes.length} selected)` : '';
+        }
+    }
+
+    // Update download link with current filters
+    function updateDownloadLink() {
+        const form = document.getElementById('filterForm');
+        const formData = new FormData(form);
+        const params = new URLSearchParams();
+
+        for (let [key, value] of formData.entries()) {
+            if (value) {
+                params.append(key, value);
+            }
+        }
+
+        const downloadBtn = document.getElementById('downloadBtn');
+        downloadBtn.href = '/download_expenses_csv?' + params.toString();
+    }
+
+    // Auto-submit form on filter change (optional)
+    const autoSubmitInputs = document.querySelectorAll('#start_date, #end_date, #min_amount, #max_amount');
+    autoSubmitInputs.forEach(input => {
+        input.addEventListener('change', function() {
+            updateDownloadLink();
+        });
+    });
+
+    // Keyboard shortcuts
+    document.addEventListener('keydown', function(e) {
+        if (e.ctrlKey && e.key === 'a') {
+            e.preventDefault();
+            selectAll();
+        }
+        if (e.key === 'Delete') {
+            const selectedCheckboxes = document.querySelectorAll('.expense-checkbox:checked');
+            if (selectedCheckboxes.length > 0) {
+                deleteSelected();
+            }
+        }
+    });
+
+    // Add event listeners to update count and download link
+    document.addEventListener('DOMContentLoaded', function() {
+        const categoryCheckboxes = document.querySelectorAll('.category-checkbox');
+        categoryCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                updateCategoryCount();
+                updateDownloadLink();
+            });
+        });
+        updateCategoryCount(); // Initial count
+        updateDownloadLink(); // Initial download link
+    });
+</script>
+
+</body>
+</html>

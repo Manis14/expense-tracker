@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Expense - Expense Tracker</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #e67e22;
+            --primary-dark: #d35400;
+            --secondary-color: #f39c12;
+            --background: #1a1a1a;
+            --surface: #2d2d2d;
+            --surface-light: #3d3d3d;
+            --text-primary: #ffffff;
+            --text-secondary: #b3b3b3;
+            --border: #444444;
+            --success: #27ae60;
+            --error: #e74c3c;
+            --warning: #f39c12;
+            --info: #3498db;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .add-expense-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 30px;
+            text-align: center;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transform: rotate(45deg);
+            animation: shine 3s infinite;
+        }
+
+        @keyframes shine {
+            0% { transform: translateX(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) rotate(45deg); }
+        }
+
+        .card-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            display: block;
+            position: relative;
+            z-index: 1;
+        }
+
+        .card-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .card-subtitle {
+            font-size: 1rem;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+
+        .expense-form {
+            padding: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-label {
+            display: flex;
+            align-items: center;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+        }
+
+        .form-label i {
+            margin-right: 8px;
+            color: #667eea;
+            width: 16px;
+        }
+
+        .form-input, .form-select, .form-textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            font-size: 1rem;
+            background: white;
+            color: #333;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .amount-input {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .btn-submit {
+            flex: 1;
+            padding: 14px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            text-decoration: none;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-submit:active {
+            transform: translateY(0);
+        }
+
+        .btn-cancel {
+            background: linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%);
+            box-shadow: 0 4px 15px rgba(149, 165, 166, 0.3);
+        }
+
+        .btn-cancel:hover {
+            box-shadow: 0 6px 20px rgba(149, 165, 166, 0.4);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                max-width: 95%;
+                padding: 0 10px;
+            }
+
+            .card-header {
+                padding: 25px 20px;
+            }
+
+            .card-icon {
+                font-size: 2.5rem;
+            }
+
+            .card-title {
+                font-size: 1.75rem;
+            }
+
+            .expense-form {
+                padding: 25px 20px;
+            }
+
+            .button-group {
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .btn-submit {
+                padding: 16px 20px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+
+            .card-header {
+                padding: 20px 15px;
+            }
+
+            .card-icon {
+                font-size: 2rem;
+            }
+
+            .card-title {
+                font-size: 1.5rem;
+            }
+
+            .expense-form {
+                padding: 20px 15px;
+            }
+
+            .form-input, .form-select, .form-textarea {
+                padding: 10px 14px;
+            }
+        }
+
+        /* Animation for form elements */
+        .form-group {
+            opacity: 0;
+            transform: translateY(20px);
+            animation: slideUp 0.6s ease forwards;
+        }
+
+        .form-group:nth-child(1) { animation-delay: 0.1s; }
+        .form-group:nth-child(2) { animation-delay: 0.2s; }
+        .form-group:nth-child(3) { animation-delay: 0.3s; }
+        .form-group:nth-child(4) { animation-delay: 0.4s; }
+
+        @keyframes slideUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .button-group {
+            opacity: 0;
+            transform: translateY(20px);
+            animation: slideUp 0.6s ease forwards;
+            animation-delay: 0.5s;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="add-expense-card">
+            <div class="card-header">
+                <i class="fas fa-edit card-icon"></i>
+                <h1 class="card-title">Edit Expense</h1>
+                <p class="card-subtitle">Update your expense details below</p>
+            </div>
+
+            <form method="post" action="/edit_expense/{{ expense.id }}" class="expense-form">
+            <div class="form-group">
+                <label for="amount" class="form-label">
+                    <i class="fas "></i>
+                    Amount
+                </label>
+                <input type="number" id="amount" name="amount" class="form-input amount-input"
+                       step="0.01" min="0.01" value="{{ expense.amount }}" required>
+            </div>
+
+            <div class="form-group">
+                <label for="category" class="form-label">
+                    <i class="fas fa-tags"></i>
+                    Category
+                </label>
+                <select id="category" name="category" class="form-select" required>
+                    {% for category in categories %}
+                    <option value="{{ category[0] }}" {% if category[0] == expense.category %}selected{% endif %}>
+                        {{ category[0] }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="date" class="form-label">
+                    <i class="fas fa-calendar-alt"></i>
+                    Date
+                </label>
+                <input type="date" id="date" name="date" class="form-input" value="{{ expense.date }}" required>
+            </div>
+
+            <div class="form-group">
+                <label for="description" class="form-label">
+                    <i class="fas fa-sticky-note"></i>
+                    Description
+                </label>
+                <textarea id="description" name="description" class="form-textarea"
+                          placeholder="Update expense details...">{{ expense.description if expense.description else '' }}</textarea>
+            </div>
+
+            <div class="button-group">
+                <button type="submit" class="btn-submit">
+                    <i class="fas fa-save"></i>
+                    Update Expense
+                </button>
+                <a href="/view-expense" class="btn-submit btn-cancel">
+                    <i class="fas fa-times"></i>
+                    Cancel
+                </a>
+            </div>
+            </form>
+
+        </div>
+    </div>
+</body>
+</html>
