@@ -23,3 +23,6 @@ aiofiles
 bcrypt
 # Email functionality (if using mail_config)
 fastapi-mail
+
+
+itsdangerous
