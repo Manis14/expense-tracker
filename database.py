@@ -5,27 +5,30 @@ from datetime import datetime,date
 import csv
 import io
 import bcrypt
-
+from urllib.parse import urlparse
+import  os
 import warnings
 
 warnings.filterwarnings('ignore')
 
 
 class Database:  # Capitalized class name
+
     def __init__(self):
-        self.hostname = 'localhost'
-        self.database = 'expense_tracker'
-        self.username = 'postgres'
-        self.port_id = 5432
-        self.pwd = "123Qwer@"
+        result = urlparse(os.environ.get("DATABASE_URL"))
+        # self.hostname = 'localhost'
+        # self.database = 'expense_tracker'
+        # self.username = 'postgres'
+        # self.port_id = 5432
+        # self.pwd = "123Qwer@"
 
         try:
             self.conn = psycopg2.connect(
-                host=self.hostname,
-                dbname=self.database,
-                user=self.username,
-                password=self.pwd,
-                port=self.port_id
+                database=result.path[1:],
+                user=result.username,
+                password=result.password,
+                host=result.hostname,
+                port=result.port
             )
             self.cur = self.conn.cursor()
         except Exception as e:
