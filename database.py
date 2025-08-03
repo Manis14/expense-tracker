@@ -522,3 +522,56 @@ class Database:  # Capitalized class name
         self.cur.execute(query, (user_id, year,))
         result = self.cur.fetchall()
         return result
+
+    def initialize_schema(self):
+        """Create tables and insert default categories if not already inserted"""
+        try:
+            self.cur.execute("""
+                CREATE TABLE IF NOT EXISTS users (
+                    id SERIAL PRIMARY KEY,
+                    username TEXT NOT NULL,
+                    email TEXT UNIQUE NOT NULL,
+                    password_hash TEXT NOT NULL
+                );
+    
+                CREATE TABLE IF NOT EXISTS categories(
+                    id SERIAL PRIMARY KEY,
+                    name TEXT NOT NULL UNIQUE
+                );
+    
+                CREATE TABLE IF NOT EXISTS expenses (
+                    id SERIAL PRIMARY KEY,
+                    amount FLOAT NOT NULL,
+                    description TEXT,
+                    date DATE DEFAULT CURRENT_DATE,
+                    category_id INTEGER REFERENCES categories(id),
+                    user_id INTEGER REFERENCES users(id),
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                );
+            """)
+            self.conn.commit()
+
+            # Insert default categories if not already present
+            default_categories = [
+                "Groceries", "Rent", "Utilities", "Transportation", "Mobile Recharge", "Fuel", "Medical",
+                "Restaurants", "Cafes", "Snacks", "Delivery", "Shopping", "Online Shopping", "Electronics",
+                "Fashion & Accessories", "Personal Care Products", "Home Appliances", "Books & Media",
+                "Movies", "Games", "Streaming Services", "Music", "Gym Membership", "Salon & Grooming",
+                "Childcare", "Food", "Pet Care", "Tuition", "Stationery", "Online Courses",
+                "Software Subscriptions", "Flight Tickets", "Hotel Bookings", "Tour Packages", "Local Transport",
+                "Loan Repayment", "Insurance", "Investments", "Savings", "Donations", "Gifts", "Miscellaneous",
+                "Emergency", "Others"
+            ]
+
+            for category in default_categories:
+                self.cur.execute(
+                    "INSERT INTO categories (name) VALUES (%s) ON CONFLICT (name) DO NOTHING",
+                    (category,)
+                )
+
+            self.conn.commit()
+            print("✅ Tables created and default categories inserted.")
+
+        except Exception as e:
+            self.conn.rollback()
+            print(f"❌ Error initializing schema: {e}")
