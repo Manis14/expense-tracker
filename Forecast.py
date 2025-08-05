@@ -40,8 +40,6 @@ class ForeCast:
 
     def check_data_quality(self, df):
         """Check if data is suitable for forecasting"""
-        if df is None or len(df) < 10:
-            return False, "Need at least 10 past expenses"
 
         # Check for too many zeros
         zero_ratio = (df['amount'] == 0).sum() / len(df)
