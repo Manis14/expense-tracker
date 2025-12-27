@@ -16,11 +16,6 @@ class Database:  # Capitalized class name
 
     def __init__(self):
         result = urlparse(os.environ.get("DATABASE_URL"))
-        # self.hostname = 'localhost'
-        # self.database = 'expense_tracker'
-        # self.username = 'postgres'
-        # self.port_id = 5432
-        # self.pwd = "123Qwer@"
 
         try:
             self.conn = psycopg2.connect(
@@ -575,3 +570,4 @@ class Database:  # Capitalized class name
         except Exception as e:
             self.conn.rollback()
             print(f"❌ Error initializing schema: {e}")
+
